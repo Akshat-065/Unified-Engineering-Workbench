@@ -1,0 +1,6 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Workbench API (CMake)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/vs18-x64/Release/workbench_server.exe", "cwd": "${workspaceFolder}", "environment": [{ "name": "WORKBENCH_PORT", "value": "8080" }], "console": "externalTerminal", "preLaunchTask": "CMake: Build" }
+  ]
+}

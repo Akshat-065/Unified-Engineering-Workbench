@@ -1,0 +1,35 @@
+/build/
+/frontend/node_modules/
+/frontend/dist/
+__pycache__/
+*.py[cod]
+/.vs/
+/out/
+
+# CMake-generated files (for out-of-tree or alternate local builds)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Testing/
+
+# Visual Studio user state and generated build products
+*.suo
+*.user
+*.sln.docstates
+*.obj
+*.pdb
+*.exe
+*.dll
+
+# Local environment, credentials, and temporary logs
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+*.temp
+
+# Python virtual environments
+.venv/
+venv/

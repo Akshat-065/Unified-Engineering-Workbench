@@ -16,6 +16,7 @@ export default function HardwareWorkspace({ backendAvailable }) {
       const response=await fetch(`/api/hardware/devices/${encodeURIComponent(device.id)}/${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:action==='connect'?JSON.stringify({simulate_timeout:simulateTimeout}):'{}'});
       const body=await response.json();if(!response.ok)throw new Error(body.error||`Backend returned HTTP ${response.status}`);
       setDevices((current)=>current.map((d)=>d.id===body.id?body:d));
+      window.dispatchEvent(new CustomEvent('workbench:operation',{detail:`${body.status==='error'?'Simulated device timeout':'Device '+action} · ${body.name}`}));
       if(action==='connect'&&simulateTimeout)setFailureArmed((current)=>({...current,[device.id]:false}));
     }catch(e){setError(e instanceof Error?e.message:'Device action failed');}
     finally{setPending('');}

@@ -35,3 +35,63 @@
 .ml-chart-empty { padding:60px 0; text-align:center; color:#758395; }
 @media (max-width:1000px) { .ml-metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .ml-grid-two { grid-template-columns:1fr; } }
 @media (max-width:560px) { .ml-metric-grid { grid-template-columns:1fr; } .ml-equations > div { flex-direction:column; } .ml-equations b { text-align:left; } }
+
+/* Dashboard activity and system information */
+.module-offline { color:#a65c52!important; }
+.module-offline i { background:#c96b5d!important; }
+.activity-count { color:#89958e; font-size:10px; }
+.operation-list { display:grid; }
+.operation-row { display:grid; grid-template-columns:22px 1fr auto; align-items:center; gap:9px; min-height:43px; border-bottom:1px solid #edf0ee; color:#526258; font-size:11px; }
+.operation-row:last-child { border-bottom:0; }
+.operation-mark { display:grid; place-items:center; width:20px; height:20px; color:#6e9a54; background:#eff6ea; border-radius:50%; }
+.operation-row time { color:#96a19a; font-size:9px; }
+.offline-badge { color:#a65c52!important; }
+.offline-badge i { background:#c96b5d!important; }
+.system-row > span:last-child { max-width:68%; overflow-wrap:anywhere; text-align:right; }
+
+/* Thermal solver workspace */
+.thermal-page { max-width:1500px; margin:0 auto; }
+.thermal-layout { display:grid; grid-template-columns:minmax(310px,.8fr) minmax(0,1.35fr); align-items:start; gap:15px; }
+.thermal-input-panel,.thermal-result-panel { padding:18px; }
+.thermal-field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:17px; }
+.thermal-field-grid label { display:grid; grid-template-columns:1fr auto; align-items:center; gap:5px 8px; color:#526258; font-size:10px; font-weight:600; }
+.thermal-field-grid label span { color:#93a098; font-size:9px; font-weight:400; }
+.thermal-field-grid input { grid-column:1/-1; width:100%; min-width:0; padding:9px 10px; border:1px solid #dfe6e1; border-radius:5px; outline:none; color:#34443b; background:#fff; font:11px 'DM Mono',monospace; }
+.thermal-field-grid input:focus { border-color:#84a56e; box-shadow:0 0 0 2px #eff5ea; }
+.thermal-mesh-select { display:grid; gap:5px; margin-top:18px; padding-top:14px; border-top:1px solid #edf0ee; }
+.thermal-mesh-select>strong { color:#506055; font-size:11px; }
+.thermal-mesh-select>span { color:#909b94; font-size:9px; }
+.thermal-mesh-select>div { display:flex; flex-wrap:wrap; gap:7px; margin-top:5px; }
+.thermal-mesh-select label { display:flex; align-items:center; gap:5px; padding:6px 8px; border:1px solid #e4eae5; border-radius:4px; color:#65746a; font-size:9px; }
+.thermal-mesh-select input { accent-color:#698953; }
+.thermal-validation { display:flex; align-items:center; gap:7px; margin-top:12px; color:#a36148; font-size:10px; }
+.thermal-validation svg { flex:none; }
+.thermal-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.cancel-action,.export-action { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border:1px solid #e1e7e2; border-radius:5px; color:#596960; background:#f6f8f6; font:500 10px 'DM Sans',sans-serif; cursor:pointer; }
+.cancel-action { border-color:#eed6d0; color:#a25749; background:#fff6f3; }
+.cancel-action:hover { background:#ffefeb; }
+.export-action:hover { border-color:#cbd8c8; background:#f0f5ed; }
+.thermal-status { margin-top:10px; padding:9px 10px; border:1px solid #dfe8e1; border-radius:5px; color:#68786e; background:#f7faf7; font-size:10px; line-height:1.45; }
+.thermal-status.success { color:#557344; border-color:#dbe8d4; background:#f3f8f0; }
+.thermal-result-panel .panel-heading select { max-width:160px; padding:7px 9px; border:1px solid #e0e7e1; border-radius:4px; color:#58675d; background:#fff; font-size:10px; }
+.thermal-chart-scroll { width:100%; overflow-x:auto; }
+.thermal-chart { display:block; width:100%; min-width:540px; height:auto; margin-top:14px; }
+.thermal-numerical-line { fill:none; stroke:#4e8554; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.thermal-analytical-line { fill:none; stroke:#df9554; stroke-width:1.8; stroke-dasharray:6 4; }
+.thermal-chart-legend { display:flex; flex-wrap:wrap; gap:16px; margin:4px 0 18px 62px; color:#77847b; font-size:9px; }
+.thermal-chart-legend span { display:flex; align-items:center; gap:6px; }
+.thermal-chart-legend i { width:15px; height:3px; border-radius:2px; }
+.thermal-legend-numerical { background:#4e8554; }
+.thermal-legend-analytical { background:#df9554; }
+.thermal-error-table { padding-top:13px; border-top:1px solid #edf0ee; }
+.thermal-error-row { display:grid; grid-template-columns:70px minmax(40px,1fr) 120px; align-items:center; gap:9px; margin-top:11px; color:#66746b; font-size:9px; }
+.thermal-error-row strong { color:#405448; text-align:right; font:10px 'DM Mono',monospace; }
+.thermal-error-track { height:6px; overflow:hidden; border-radius:4px; background:#f0f3f0; }
+.thermal-error-track i { display:block; height:100%; min-width:3px; border-radius:4px; background:#83a969; }
+.thermal-empty { display:grid; justify-items:center; gap:8px; padding:70px 18px; color:#86948a; text-align:center; }
+.thermal-empty strong { color:#526258; font-size:12px; }
+.thermal-empty span { font-size:10px; }
+.panel-action-group { display:flex; align-items:center; gap:8px; }
+.ml-export-note { margin:0; color:#87948b; font-size:10px; }
+@media(max-width:1050px) { .thermal-layout { grid-template-columns:1fr; } }
+@media(max-width:600px) { .thermal-field-grid { grid-template-columns:1fr; } .thermal-input-panel,.thermal-result-panel { padding:13px; } .thermal-error-row { grid-template-columns:55px minmax(25px,1fr) 100px; gap:6px; } .thermal-chart-legend { margin-left:3px; } .system-row { gap:10px; } .system-row > span:first-child { flex:none; } }

@@ -4,6 +4,7 @@
 #include "performance/benchmark.h"
 #include "hardware/mock_adapters.h"
 #include "ml/backpropagation.h"
+#include "thermal/solver.h"
 
 #include <httplib.h>
 #include <nlohmann/json.hpp>
@@ -12,7 +13,10 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <set>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 using nlohmann::json;
@@ -62,6 +66,54 @@ int main() {
     const auto status = workbench::get_service_status();
     response.set_content(json{{"name", status.name}, {"version", status.version},
                               {"healthy", status.healthy}}.dump(), "application/json");
+  });
+  server.Post("/api/thermal/solve", [](const httplib::Request& request, httplib::Response& response) {
+    try {
+      const auto body = json::parse(request.body);
+      const auto& values = body.at("parameters");
+      workbench::thermal::Parameters parameters;
+      parameters.length_m = values.at("length_m").get<double>();
+      parameters.area_m2 = values.at("area_m2").get<double>();
+      parameters.conductivity_w_per_m_k = values.at("conductivity_w_per_m_k").get<double>();
+      parameters.heat_generation_w_per_m3 = values.at("heat_generation_w_per_m3").get<double>();
+      parameters.left_temperature_c = values.at("left_temperature_c").get<double>();
+      parameters.right_temperature_c = values.at("right_temperature_c").get<double>();
+      const auto requested_meshes = body.at("meshes").get<std::vector<std::size_t>>();
+      const std::set<std::size_t> allowed_meshes{10, 20, 40, 80};
+      if (requested_meshes.empty() || requested_meshes.size() > allowed_meshes.size())
+        throw std::invalid_argument("Select one or more meshes from 10, 20, 40, and 80 elements.");
+      std::set<std::size_t> unique_meshes;
+      for (const auto mesh : requested_meshes) {
+        if (allowed_meshes.count(mesh) == 0)
+          throw std::invalid_argument("Mesh size must be one of 10, 20, 40, or 80 elements.");
+        if (!unique_meshes.insert(mesh).second)
+          throw std::invalid_argument("Duplicate mesh sizes are not allowed.");
+      }
+      json meshes = json::array();
+      for (const auto mesh_size : requested_meshes) {
+        const auto result = workbench::thermal::solve(parameters, mesh_size);
+        json nodes = json::array();
+        for (const auto& point : result.nodes) {
+          nodes.push_back({{"x_m",point.position_m},
+            {"finite_element_temperature_C",point.finite_element_temperature_c},
+            {"analytical_temperature_C",point.analytical_temperature_c},
+            {"absolute_error_C",point.absolute_error_c}});
+        }
+        json midpoints = json::array();
+        for (const auto& point : result.midpoints) {
+          midpoints.push_back({{"x_m",point.position_m},
+            {"finite_element_temperature_C",point.finite_element_temperature_c},
+            {"analytical_temperature_C",point.analytical_temperature_c},
+            {"absolute_error_C",point.absolute_error_c}});
+        }
+        meshes.push_back({{"element_count",mesh_size},{"maximum_midpoint_error_C",result.maximum_midpoint_error_c},
+                          {"nodes",nodes},{"midpoints",midpoints}});
+      }
+      response.set_content(json{{"parameters",values},{"meshes",meshes}}.dump(),"application/json");
+    } catch (const std::exception& error) {
+      response.status = 400;
+      response.set_content(json{{"error",error.what()}}.dump(),"application/json");
+    }
   });
   server.Get("/api/hardware/devices", [hardware_devices](const httplib::Request&, httplib::Response& response) {
     json devices=json::array();

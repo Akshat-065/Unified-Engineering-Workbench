@@ -1,6 +1,6 @@
 # Unified Engineering Workbench
 
-Foundation and Part 2 thermal-analysis phase for the PASS SCIENCE WORKS R&D Internship 2026–2027 common assignment. The project provides a React/Vite dashboard, a C++17 service health API, and a one-dimensional steady-state thermal finite element solver.
+Unified Engineering Workbench for the PASS SCIENCE WORKS R&D Internship 2026–2027 common assignment. The project provides a React/Vite engineering dashboard integrated with C++17 APIs and numerical modules for geometry validation, thermal FEA, parallel benchmarks, simulated hardware adapters, and hand-derived backpropagation.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ Foundation and Part 2 thermal-analysis phase for the PASS SCIENCE WORKS R&D Inte
 - Git and network access for the first CMake configure (CMake FetchContent downloads pinned dependencies).
 - Python 3 with Matplotlib for rendering thermal plots from the solver CSV output (`python -m pip install -r requirements.txt`).
 
-The plotter uses Python's standard-library `argparse`, `csv`, and `pathlib` modules plus `matplotlib.pyplot`, pinned as `matplotlib==3.10.8` in the root `requirements.txt`. It only reads CSV output from the C++ solver; numerical solving and CSV generation remain in C++.
+The thermal plotter uses Python's standard-library `argparse`, `csv`, and `pathlib` modules plus `matplotlib.pyplot`, pinned as `matplotlib==3.10.8` in the root `requirements.txt`. The Task F plotter emits SVG using only the Python standard library. Plotters only visualize CSV output from C++; numerical solving and CSV generation remain in C++.
 
 ### C++ dependencies
 
@@ -78,11 +78,11 @@ npm run dev
 
 Open the local URL printed by Vite (usually `http://localhost:5173`). Vite proxies `/api` requests to the local backend at `http://127.0.0.1:8080`. To change the backend port, set `WORKBENCH_PORT` and update the proxy in `frontend/vite.config.js` to match.
 
-The endpoints are `GET /api/health` (`{"status":"ok","healthy":true}`) and `GET /api/status` (service name, version, and health). The dashboard shows connection state, server version, and request failures, and its retry control rechecks the service.
+The API includes `GET /api/health`, `GET /api/status`, `POST /api/thermal/solve`, geometry upload routes, performance benchmark routes, simulated hardware routes, and `GET /api/ml/backprop`. The dashboard shows backend and host status, module navigation, and recent operations. See [docs/react-integration.md](docs/react-integration.md) for page/API mapping, exports, and safe cancellation behavior.
 
 ## Repository layout
 
-`frontend/` contains the React UI. C++ public interfaces are under `include/`, implementation under `src/`, and `tests/` contains GoogleTest suites. The thermal module is implemented in `include/thermal/` and `src/thermal/`; other engineering modules remain reserved for later phases.
+`frontend/` contains the React UI. C++ public interfaces are under `include/`, implementation under `src/`, and `tests/` contains GoogleTest suites. Each completed engineering module is integrated through the C++ API; React handles user interaction, visualization, and API communication only.
 
 The Geometry Viewer accepts validated ASCII STL and temperature CSV uploads through the C++ API. See [docs/geometry-and-temperature-viewers.md](docs/geometry-and-temperature-viewers.md) for formats, size limits, example-data provenance, and tests. Binary STL, native CAD solids, and mesh-to-result registration are not supported.
 

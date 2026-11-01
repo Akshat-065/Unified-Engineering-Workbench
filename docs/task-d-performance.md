@@ -39,9 +39,9 @@ The final Release CTest run generated the CSVs on an Intel Core i5-1035G1 host (
 
 | Workers | Serial median (ms) | Parallel median (ms) | Observed speedup | Efficiency |
 |---:|---:|---:|---:|---:|
-| 1 | 11.9156 | 9.9899 | 1.1928× | 119.28% |
-| 2 | 12.6852 | 8.8031 | 1.4410× | 72.05% |
-| 3 | 12.7441 | 6.5389 | 1.9490× | 64.97% |
-| 4 | 9.5384 | 6.1843 | 1.5424× | 38.56% |
+| 1 | 7.0947 | 7.1022 | 0.9989× | 99.89% |
+| 2 | 6.6252 | 3.9645 | 1.6711× | 83.56% |
+| 3 | 5.8538 | 2.6059 | 2.2464× | 74.88% |
+| 4 | 6.7014 | 2.1907 | 3.0590× | 76.48% |
 
 This is one short local measurement, not a general performance guarantee. Notice the serial medians varied between runs, so background load and CPU frequency materially affect this small workload. The CTest-generated CSV launch-to-ready fields are blank because the C++ benchmark test does not start the React/API application; the dashboard measures and displays that value during a real application session.

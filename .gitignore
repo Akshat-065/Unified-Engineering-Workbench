@@ -6,6 +6,10 @@ __pycache__/
 /.vs/
 /out/
 
+# Generated submission packages (keep the reproducible packaging source in Git)
+/*_Workbench/
+/*_Workbench.zip
+
 # CMake-generated files (for out-of-tree or alternate local builds)
 CMakeFiles/
 CMakeCache.txt
@@ -27,6 +31,7 @@ Testing/
 .env.*
 !.env.example
 *.log
+!docs/demo/*.log
 *.tmp
 *.temp
 

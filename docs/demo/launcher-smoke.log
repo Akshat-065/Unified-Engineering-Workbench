@@ -1,0 +1,1 @@
+2026-11-01T13:18:43.7610468Z | Launch.exe self-test exit=0 | launcher started bundled backend; /api/health and / returned HTTP 200; backend stopped by job-object cleanup. Package root: extracted-folder layout.

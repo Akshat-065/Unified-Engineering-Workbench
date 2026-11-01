@@ -7,6 +7,13 @@ project(UnifiedEngineeringWorkbench VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+option(WORKBENCH_STATIC_RUNTIME
+  "Link MSVC executables to the static Visual C++ runtime for offline distribution" OFF)
+if(MSVC AND WORKBENCH_STATIC_RUNTIME)
+  # Keep packaged Windows executables independent of a separately installed
+  # Visual C++ runtime. Windows 11 supplies the Universal CRT itself.
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 include(CTest)
 option(WORKBENCH_USE_SYSTEM_DEPENDENCIES
@@ -143,6 +150,12 @@ target_link_libraries(workbench_server PRIVATE workbench_core httplib::httplib n
 if(WIN32)
   target_link_libraries(workbench_server PRIVATE ws2_32)
   target_link_libraries(workbench_core PRIVATE advapi32)
+endif()
+
+if(WIN32)
+  add_executable(workbench_launcher WIN32 scripts/windows_launcher.cpp)
+  target_link_libraries(workbench_launcher PRIVATE shell32 winhttp ws2_32)
+  set_target_properties(workbench_launcher PROPERTIES OUTPUT_NAME "Launch")
 endif()
 
 add_executable(workbench_thermal src/thermal/main.cpp)

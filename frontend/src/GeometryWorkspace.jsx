@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Boxes, FileUp, Thermometer, RotateCcw } from 'lucide-react';
+import { Boxes, FileUp, Thermometer, RotateCcw, Square } from 'lucide-react';
 import ThreeViewport from './ThreeViewport.jsx';
 
 const LIMIT = 16 * 1024 * 1024;

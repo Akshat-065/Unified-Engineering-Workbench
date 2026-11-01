@@ -1,93 +1,146 @@
 # Unified Engineering Workbench
 
-Unified Engineering Workbench for the PASS SCIENCE WORKS R&D Internship 2026–2027 common assignment. The project provides a React/Vite engineering dashboard integrated with C++17 APIs and numerical modules for geometry validation, thermal FEA, parallel benchmarks, simulated hardware adapters, and hand-derived backpropagation.
+Unified Engineering Workbench is a Windows x64 engineering dashboard for the PASS SCIENCE WORKS R&D Internship 2026–2027 common assignment. It brings together C++17 geometry parsing, one-dimensional steady thermal FEA, CPU-parallel thermal batches, a documented embedded reference design with simulated adapters, and manually differentiated neural-network backpropagation.
 
-## Requirements
+## Submission package and one-click launch
 
-- Windows 11 x64 and Visual Studio 18 2026 Build Tools with the **Desktop development with C++** workload (MSVC and Windows SDK).
-- CMake 4.2 or newer for the Visual Studio 18 generator.
-- Node.js 20 or newer with npm.
-- Git and network access for the first CMake configure (CMake FetchContent downloads pinned dependencies).
-- Python 3 with Matplotlib for rendering thermal plots from the solver CSV output (`python -m pip install -r requirements.txt`).
+Extract `CandidateID_Workbench.zip` to a writable folder. Open the extracted `CandidateID_Workbench` folder and double-click `Launch.exe`. The launcher starts the bundled C++ service without a console, waits for its health endpoint, and opens the frontend in the Windows default browser. Keep the small launcher status window open; clicking OK stops the service. The backend binds only to loopback and uses an available local port. No administrator access, Node.js, Python, CMake, compiler, VS Code, or network connection is needed at run time. Windows 11 x64 and its inbox system libraries are required.
 
-The thermal plotter uses Python's standard-library `argparse`, `csv`, and `pathlib` modules plus `matplotlib.pyplot`, pinned as `matplotlib==3.10.8` in the root `requirements.txt`. The Task F plotter emits SVG using only the Python standard library. Plotters only visualize CSV output from C++; numerical solving and CSV generation remain in C++.
+The launcher assumes the zip folder has not been renamed internally and the extracted contents stay together. The archive currently uses the placeholder name `CandidateID_Workbench`; replace `CandidateID` with the assigned candidate identifier before submission if required. `Launch.exe` is the packaged launcher, not the backend itself. `backend/workbench_server.exe` and `frontend/dist/` are its runtime payload.
 
-### C++ dependencies
+## Features
 
-| Dependency | Version | Purpose | Acquisition |
+- Overview page with backend health/version, module links, host metadata and session operations.
+- Geometry page: C++ validation of ASCII STL and temperature-point CSV; Three.js model/point-cloud display, orbit navigation, fit-to-view, temperature legend and node inspection.
+- Thermal page: configurable physical parameters and 10/20/40/80 element meshes, C++ finite-element and analytical profiles, midpoint errors and CSV export.
+- Performance page: fixed-seed C++ thermal batch, serial and bounded worker-pool comparison, five repetitions, medians, speedup, efficiency, host metadata and CSV export.
+- Hardware page: Pico 2, Arty A7-35T and J-Link EDU Mini reference assumptions; three C++ mock adapters, telemetry, connection controls and recoverable simulated timeout. No physical hardware is connected.
+- Backpropagation page: C++ forward pass, chain-rule gradients, central finite differences, simultaneous update, 100 subsequent training steps and loss chart/export.
+- Asynchronous requests, explicit loading/error/empty states and cancellation that retains prior completed results.
+
+## Architecture
+
+```text
+React 18 + Vite + Three.js (static frontend)
+                 | same-origin HTTP / JSON
+                 v
+cpp-httplib C++17 HTTP service (backend/)
+                 |
+                 v
+workbench_core (C++ modules: geometry, thermal, performance, hardware, ML)
+```
+
+The React code handles user interaction, chart/3D presentation and API communication. Numerical methods, file parsing/validation, workload generation and concurrency are implemented in the C++ core. The server serves the built frontend only when `WORKBENCH_WEB_ROOT` is configured by the package launcher; source-development Vite proxy behavior is retained.
+
+## Requirements and dependency versions
+
+### Running the extracted package
+
+- Windows 11 x64.
+- A default web browser supported by Windows ShellExecute.
+- No first-run build or Internet access. The package uses static MSVC runtime linkage; its remaining imports (`KERNEL32`, `USER32`, `SHELL32`, `WINHTTP`, `WS2_32`, `ADVAPI32`) are Windows system libraries.
+
+### Building from source
+
+- Windows 11 x64.
+- Visual Studio 18 2026 Build Tools, MSVC 19.51 or compatible, Windows 11 SDK.
+- CMake 4.5.0-rc2 was used for the recorded build; the `Visual Studio 18 2026` generator is required by the supplied preset.
+- Node.js 20+ and npm for the React build (recorded: Node 25.3.0, npm 11.13.0).
+- Internet access for CMake FetchContent on a clean checkout unless exact-version dependencies are installed or populated locally.
+- Python 3.12+ and Matplotlib 3.10.8 only to render the thermal PNG plots; the backpropagation SVG plot uses Python's standard library.
+- Python 3.12 plus `requirements-report.txt` only to regenerate the PDF report or build a ZIP with a non-placeholder candidate ID.
+
+| Dependency | Version | Purpose | License |
 | --- | --- | --- | --- |
-| cpp-httplib | 0.18.3 | Lightweight HTTP server | CMake FetchContent |
-| nlohmann/json | 3.12.0 | JSON serialization | CMake FetchContent |
-| GoogleTest | 1.15.2 | C++ unit tests | CMake FetchContent |
+| cpp-httplib | 0.18.3 | C++ HTTP service | MIT |
+| nlohmann/json | 3.12.0 | JSON | MIT |
+| GoogleTest | 1.15.2 | C++ tests | BSD-3-Clause |
+| React / React DOM | 18.3.1 | UI | MIT |
+| Vite | 6.4.5 | Frontend build/dev server | MIT |
+| Three.js | 0.187.0 | 3D visualization | MIT |
+| lucide-react | 0.468.0 | UI icons | ISC |
 
-The C++ core is a separate `workbench_core` library; the HTTP server is an executable that links the core. The dashboard uses React 18.3.1, Vite 6.4.5, and lucide-react 0.468.0, pinned in `frontend/package.json` and `frontend/package-lock.json`.
+Exact npm dependency versions are pinned in `frontend/package-lock.json`; CMake release archives have fixed versions and SHA-256 hashes in `CMakeLists.txt`. Package notices are in `THIRD_PARTY_NOTICES.txt`.
 
-## Thermal analysis (Part 2)
+## Source build and test instructions
 
-Build the C++ solver using the same CMake preset above, then run it from the repository root. The executable performs all four numerical mesh cases and writes the actual computed nodal/midpoint results and convergence values:
-
-```powershell
-cmake --preset windows-msvc-x64
-cmake --build --preset windows-msvc-x64
-ctest --test-dir build/vs18-x64 -C Release --output-on-failure
-& .\build\vs18-x64\Release\workbench_thermal.exe .\results
-Import-Csv .\results\thermal_convergence.csv | Format-Table
-python -m pip install -r requirements.txt
-python scripts/plot_thermal_results.py --results .\results
-```
-
-The solver runs uniform meshes with 10, 20, 40, and 80 elements. It writes `results/thermal_results.csv` (nodal and element-midpoint values) and `results/thermal_convergence.csv` (maximum absolute midpoint errors). The plotting script reads those C++-generated CSVs and writes labelled temperature, per-mesh analytical comparison, and convergence PNG plots in `results/`. Supply an alternate output directory to the solver and plotting script with `workbench_thermal <directory>` and `--results <directory>` respectively.
-
-Thermal implementation, equations, boundary treatment, validation, assumptions, and the interview explanation are documented in [docs/thermal-analysis.md](docs/thermal-analysis.md).
-
-## Build and run on Windows
-
-Open a Visual Studio 18 2026 x64 Developer PowerShell (or another terminal where CMake can locate the VS 18 Build Tools):
+Run these from a VS 18 x64 Developer PowerShell at the repository root:
 
 ```powershell
 cmake --preset windows-msvc-x64
-cmake --build --preset windows-msvc-x64
+cmake --build --preset windows-msvc-x64 --parallel
 ctest --test-dir build/vs18-x64 -C Release --output-on-failure
+Push-Location frontend
+npm ci
+npm run build
+Pop-Location
 ```
 
-The Windows preset uses the `Visual Studio 18 2026` generator and the existing `build/vs18-x64` directory. The pinned cpp-httplib 0.18.3, nlohmann/json 3.12.0, and (when tests are enabled) GoogleTest 1.15.2 releases are fetched as SHA-256-verified source archives. This avoids Git clone negotiation and reuses matching populated FetchContent source directories. CMake reports whether an exact-version installed package or a local source directory is used, or when a verified archive must be downloaded. An incomplete dependency directory is not considered available.
-
-Preinstalled exact-version CMake packages are preferred. Install them to a prefix and pass it explicitly, for example:
-
-```powershell
-cmake --preset windows-msvc-x64 -DCMAKE_PREFIX_PATH="C:/engineering/dependencies"
-cmake --build --preset windows-msvc-x64
-ctest --test-dir build/vs18-x64 -C Release --output-on-failure
-```
-
-Alternatively, use CMake's `FETCHCONTENT_SOURCE_DIR_HTTPLIB`, `FETCHCONTENT_SOURCE_DIR_NLOHMANN_JSON`, and `FETCHCONTENT_SOURCE_DIR_GOOGLETEST` cache options to point at already populated, matching source trees. Do not set `FETCHCONTENT_FULLY_DISCONNECTED=ON` until all required sources or packages have been verified.
-
-Run the backend in one terminal:
+To start the source-development backend and Vite frontend, use two terminals:
 
 ```powershell
 & .\build\vs18-x64\Release\workbench_server.exe
 ```
 
-Run the frontend in another:
-
 ```powershell
-cd frontend
-npm ci
+Push-Location frontend
 npm run dev
 ```
 
-Open the local URL printed by Vite (usually `http://localhost:5173`). Vite proxies `/api` requests to the local backend at `http://127.0.0.1:8080`. To change the backend port, set `WORKBENCH_PORT` and update the proxy in `frontend/vite.config.js` to match.
+Then open the local Vite URL, usually `http://localhost:5173`. Vite proxies `/api` to `127.0.0.1:8080`. This development workflow is separate from the packaged `Launch.exe` workflow.
 
-The API includes `GET /api/health`, `GET /api/status`, `POST /api/thermal/solve`, geometry upload routes, performance benchmark routes, simulated hardware routes, and `GET /api/ml/backprop`. The dashboard shows backend and host status, module navigation, and recent operations. See [docs/react-integration.md](docs/react-integration.md) for page/API mapping, exports, and safe cancellation behavior.
+Create the offline Windows payload (CMake dependencies must be present or downloadable at build time):
 
-## Repository layout
+```powershell
+./scripts/package-windows.ps1 -CandidateId CandidateID
+```
 
-`frontend/` contains the React UI. C++ public interfaces are under `include/`, implementation under `src/`, and `tests/` contains GoogleTest suites. Each completed engineering module is integrated through the C++ API; React handles user interaction, visualization, and API communication only.
+Before packaging, install the report-generation tools with `py -3.12 -m pip install -r requirements-report.txt`. This writes `<CandidateId>_Workbench/` and `<CandidateId>_Workbench.zip` without removing or replacing existing paths. The script stops if either output already exists. The default name is a placeholder; supply the assigned ID with `-CandidateId`. When exact npm dependencies are already installed and should not be reinstalled, add `-UseExistingNpmDependencies`; the script checks them with `npm ls` and still builds the production bundle.
 
-The Geometry Viewer accepts validated ASCII STL and temperature CSV uploads through the C++ API. See [docs/geometry-and-temperature-viewers.md](docs/geometry-and-temperature-viewers.md) for formats, size limits, example-data provenance, and tests. Binary STL, native CAD solids, and mesh-to-result registration are not supported.
+### VS Code
 
-Task D adds reproducible serial/CPU-parallel thermal batch benchmarking with a fixed-seed input generator and raw CSV output. See [docs/task-d-performance.md](docs/task-d-performance.md) for worker-pool details, resource limits, measurement definitions, and commands.
+Install Microsoft **C/C++** (`ms-vscode.cpptools`) to use the provided C++ launch configurations. Open the repository root, place the generated `<CandidateId>_Workbench` folder alongside it, select **Packaged Workbench (F5)** in Run and Debug, and press F5. That starts the same `Launch.exe`; it does not build the package first. CMake Tools is optional for interactive source configuration. The standalone launcher does not require VS Code or either extension.
 
-Task E adds a simulated host-connected hardware dashboard and C++ device-adapter interface for the Pico 2, Arty A7-35T and J-Link EDU Mini assumptions. It does not communicate with physical hardware. See [docs/hardware-integration.md](docs/hardware-integration.md) for the labelled block diagram, pin-voltage/interface table, safety notes and failure-recovery example.
+## Supported files and example data
 
-Task F adds a hand-derived single-sample backpropagation implementation in the C++17 core, central finite-difference checks, 100 additional training steps after the required initial update, a `/api/ml/backprop` endpoint, and the Backpropagation dashboard. Generate `results/backpropagation_loss.csv` with `workbench_ml`; use `python scripts/plot_backpropagation_loss.py` to render its SVG plot. See [docs/task-f-backpropagation.md](docs/task-f-backpropagation.md) for the full derivation, verified run values, and handwritten preparation guide. The typed derivation is a study guide and is not handwritten evidence.
+- ASCII STL only, including `solid`/`endsolid`, complete facet/loop/vertex structure and finite, non-degenerate triangles. Binary STL and native CAD solids are not supported. STL units are unspecified.
+- Temperature CSV exact header: `node_id,x_m,y_m,z_m,temperature_C`; coordinates in metres and temperature in °C; unique signed 64-bit node IDs and finite values required.
+- Upload limit is 16 MiB per file, verified at the exact accepted/rejected boundary in C++ tests.
+- `data/examples/unit_tetrahedron_ascii.stl` is a self-created illustrative tetrahedron. `data/examples/synthetic_temperature_points.csv` is self-created synthetic data, **not an actual ANSYS export**. Provenance is recorded in `docs/geometry-and-temperature-viewers.md`.
+
+## API
+
+The service binds to `127.0.0.1` only. The package launcher selects an available port and sets the frontend root. Source development defaults to port 8080; set `WORKBENCH_PORT` to override it.
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| GET | `/api/health` | Health check |
+| GET | `/api/status` | Service name/version/status |
+| POST | `/api/geometry/stl` | Parse ASCII STL request body |
+| POST | `/api/geometry/temperature` | Parse exact-schema temperature CSV body |
+| POST | `/api/thermal/solve` | Solve selected thermal meshes from JSON |
+| GET/POST | `/api/performance/*` | Host metadata and serial/parallel batch benchmark |
+| GET/POST | `/api/hardware/*` | Simulated adapter discovery and state controls |
+| GET | `/api/ml/backprop` | C++ model, gradients, finite differences and training history |
+
+Full route payloads and integration behavior are described in `docs/react-integration.md`.
+
+## Tests and results
+
+The baseline MSVC Release source build and CTest run reported **28/28 passed** on 2026-11-01. A separate final package build compiled the current server and launcher with static runtime; the React production build succeeded and the full browser/API walkthrough exercised every module. A fresh source verification build compiled the final server/core/launcher, but its GoogleTest post-build discovery was blocked by Windows Application Control; rerunning the existing CTest binaries passed 28/28, and numerical core source was unchanged. The thermal solver was run for all four meshes and wrote raw CSVs in `results/`; the latest fixed-seed performance CTest exported five raw repetitions for workers 1–4; the backpropagation executable exported 102 loss rows. These are local run results, not guarantees for other hardware. See `docs/FINAL_TECHNICAL_REPORT.md` and `docs/submission/REQUIREMENT_EVIDENCE.md`.
+
+Run C++ tests with `ctest --test-dir build/vs18-x64 -C Release --output-on-failure`. Build thermal plots with `python -m pip install -r requirements.txt` then `python scripts/plot_thermal_results.py --results .\results`. `scripts/plot_backpropagation_loss.py` generates the SVG from the C++ CSV.
+
+## Known limitations
+
+- No binary STL, native CAD import, mesh-to-result registration, transient or multidimensional FEA, or physical hardware interface.
+- Hardware devices and failure recovery are mock-only. There is no firmware deployment or FPGA programming.
+- The thermal system uses the assignment's one-dimensional steady model and a dense direct solve. Performance results are workload- and machine-specific.
+- Browser request cancellation stops client acceptance but cannot interrupt an already-running synchronous C++ request.
+- A clean source build needs the documented compiler and dependency acquisition; only the extracted runtime package is intended to work offline and without developer tools.
+- The current Vite bundle is 760 KiB minified and triggers Vite's advisory over 500 KiB; the production build succeeds.
+- Candidate identifier and candidate-signed ownership declaration must be finalized before external submission.
+
+## Submission evidence
+
+The six-page maximum technical report is `docs/FINAL_TECHNICAL_REPORT.pdf` (with editable source at `.md`). The generated derivation guide is typed and is **not** handwritten evidence. Timestamped walkthrough captures and the API log are under `docs/demo/` when generated. The full evidence matrix and outstanding items are in `docs/submission/REQUIREMENT_EVIDENCE.md`.

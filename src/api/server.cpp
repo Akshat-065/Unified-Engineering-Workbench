@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <iostream>
 #include <set>
 #include <stdexcept>
@@ -57,6 +58,17 @@ int read_port() {
 int main() {
   const int port = read_port();
   httplib::Server server;
+  if (const char* web_root = std::getenv("WORKBENCH_WEB_ROOT")) {
+    if (!std::filesystem::is_directory(web_root)) {
+      std::cerr << "WORKBENCH_WEB_ROOT does not name an existing directory.\n";
+      return EXIT_FAILURE;
+    }
+    if (!server.set_mount_point("/", web_root)) {
+      std::cerr << "Unable to mount the frontend distribution directory.\n";
+      return EXIT_FAILURE;
+    }
+    std::cout << "Serving frontend from " << web_root << '\n';
+  }
   const auto hardware_devices=workbench::hardware::make_mock_devices();
   server.set_payload_max_length(workbench::geometry::kMaxGeometryUploadBytes);
   server.Get("/api/health", [](const httplib::Request&, httplib::Response& response) {

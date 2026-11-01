@@ -1,0 +1,13 @@
+# Package API smoke log
+
+Timestamp UTC: 2026-11-01T13:11:14.560Z
+Endpoint responses came from the locally packaged C++ backend. This log is from one host and contains no hardware measurements.
+
+GET /api/health -> {"healthy":true,"status":"ok"}
+GET /api/status -> {"healthy":true,"name":"Unified Engineering Workbench API","version":"0.1.0"}
+GET /api/hardware/devices -> simulated=true, device_count=3
+POST /api/geometry/stl (data/examples/unit_tetrahedron_ascii.stl) -> triangles=4, solid=self_created_unit_tetrahedron
+POST /api/geometry/temperature (synthetic example CSV) -> nodes=8, range_C=20..64
+POST /api/thermal/solve -> meshes=10:1.25C, 20:0.3124999999999716C, 40:0.07812499999997158C, 80:0.019531249999982236C
+POST /api/performance/benchmark -> cases=40, mesh=80, workers=3, reps=5, median_serial_ms=6.6395, median_parallel_ms=2.9898, max_delta_C=0
+GET /api/ml/backprop -> loss_rows=102, final_loss=1.0804984873618949e-20, max_gradient_error=1.1301892755000154e-10

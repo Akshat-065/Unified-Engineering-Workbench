@@ -13,7 +13,21 @@
         "WORKBENCH_FETCHCONTENT_QUIET": "OFF",
         "BUILD_TESTING": "ON"
       }
+    },
+    {
+      "name": "windows-msvc-x64-package",
+      "displayName": "Windows x64 offline package (Visual Studio 18 2026)",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/package-vs18-x64",
+      "cacheVariables": {
+        "WORKBENCH_STATIC_RUNTIME": "ON",
+        "BUILD_TESTING": "OFF"
+      }
     }
   ],
-  "buildPresets": [{ "name": "windows-msvc-x64", "configurePreset": "windows-msvc-x64", "configuration": "Release" }]
+  "buildPresets": [
+    { "name": "windows-msvc-x64", "configurePreset": "windows-msvc-x64", "configuration": "Release" },
+    { "name": "windows-msvc-x64-package", "configurePreset": "windows-msvc-x64-package", "configuration": "Release" }
+  ]
 }

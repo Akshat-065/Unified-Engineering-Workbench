@@ -1,6 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [
-    { "name": "Workbench API (CMake)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/vs18-x64/Release/workbench_server.exe", "cwd": "${workspaceFolder}", "environment": [{ "name": "WORKBENCH_PORT", "value": "8080" }], "console": "externalTerminal", "preLaunchTask": "CMake: Build" }
+    { "name": "Packaged Workbench (F5)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/CandidateID_Workbench/Launch.exe", "cwd": "${workspaceFolder}/CandidateID_Workbench", "console": "internalConsole" },
+    { "name": "Workbench API (CMake source build)", "type": "cppvsdbg", "request": "launch", "program": "${workspaceFolder}/build/vs18-x64/Release/workbench_server.exe", "cwd": "${workspaceFolder}", "environment": [{ "name": "WORKBENCH_PORT", "value": "8080" }], "console": "externalTerminal", "preLaunchTask": "CMake: Build" }
   ]
 }
